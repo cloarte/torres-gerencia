@@ -52,7 +52,7 @@ const sections: NavSection[] = [
   },
   {
     label: "VENCIDOS",
-    items: [{ title: "Vencidos", url: "/vencidos", icon: AlertTriangle }],
+    items: [{ title: "Pool de Decisión", url: "/vencidos/pool", icon: AlertTriangle }],
   },
   {
     label: "CUENTA",

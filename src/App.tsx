@@ -14,6 +14,7 @@ import ReporteVentasProducto from "@/pages/ReporteVentasProducto";
 import ReporteVentasLinea from "@/pages/ReporteVentasLinea";
 import ReporteDevoluciones from "@/pages/ReporteDevoluciones";
 import Gastos from "@/pages/Gastos";
+import VencidosPool from "@/pages/VencidosPool";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/reportes/ventas-linea" element={<ReporteVentasLinea />} />
             <Route path="/reportes/devoluciones" element={<ReporteDevoluciones />} />
             <Route path="/gastos" element={<Gastos />} />
+            <Route path="/vencidos/pool" element={<VencidosPool />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
