@@ -150,8 +150,7 @@ const topRutas = [
 ];
 
 // ── Custom tooltip for line chart ────────────────────────────────
-import { forwardRef } from "react";
-const LineTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, label }, ref) => {
+const LineTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-md text-xs space-y-1">
@@ -160,7 +159,8 @@ const LineTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, label },
       <p className="text-muted-foreground">Año anterior: <span className="font-bold tabular-nums">S/ {payload[1]?.value?.toLocaleString()}</span></p>
     </div>
   );
-}
+};
+LineTooltip.displayName = "LineTooltip";
 
 // ── Dashboard ────────────────────────────────────────────────────
 export default function Dashboard() {
