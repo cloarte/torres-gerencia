@@ -1,200 +1,222 @@
 import {
   TrendingUp,
-  TrendingDown,
-  AlertTriangle,
-  Clock,
-  CheckCircle2,
+  AlertCircle,
+  Bell,
+  Users,
   Truck,
+  DollarSign,
+  ShoppingCart,
+  RotateCcw,
   ArrowRight,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-} from "recharts";
-import {
-  kpiCards,
-  ventasSemana,
-  ventasPorCategoria,
-  pedidosRecientes,
-  gastosAprobacion,
-} from "@/data/mockDashboard";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-const trendIcons = {
-  up: TrendingUp,
-  down: TrendingDown,
-  warning: Clock,
-  danger: AlertTriangle,
-};
+type Period = "hoy" | "semana" | "mes" | "anio";
 
-const trendColors = {
-  up: "text-success",
-  down: "text-success",
-  warning: "text-warning",
-  danger: "text-danger",
-};
+const periods: { value: Period; label: string }[] = [
+  { value: "hoy", label: "Hoy" },
+  { value: "semana", label: "Esta semana" },
+  { value: "mes", label: "Este mes" },
+  { value: "anio", label: "Este año" },
+];
 
-const estadoBadge: Record<string, { className: string; label: string }> = {
-  confirmado: { className: "bg-success/10 text-success border-0", label: "Confirmado" },
-  pendiente: { className: "bg-warning/10 text-warning border-0", label: "Pendiente" },
-  entregado: { className: "bg-primary/10 text-primary border-0", label: "Entregado" },
-};
+interface KpiCardProps {
+  label: string;
+  value: string;
+  sub?: string;
+  variation?: string;
+  variationColor?: string;
+  icon: React.ElementType;
+  iconColor?: string;
+  badge?: { value: string; color: string };
+  link?: { text: string; href: string };
+  index: number;
+}
+
+function KpiCard({
+  label,
+  value,
+  sub,
+  variation,
+  variationColor = "text-success",
+  icon: Icon,
+  iconColor = "text-muted-foreground",
+  badge,
+  link,
+  index,
+}: KpiCardProps) {
+  return (
+    <Card
+      className="shadow-sm hover:shadow-md transition-shadow animate-fade-in-up"
+      style={{ animationDelay: `${index * 70}ms` }}
+    >
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide leading-tight">
+            {label}
+          </p>
+          <div className="flex items-center gap-1.5">
+            {badge && (
+              <Badge className={cn("h-5 min-w-5 px-1.5 text-[10px] font-bold border-0 rounded-full", badge.color)}>
+                {badge.value}
+              </Badge>
+            )}
+            <Icon className={cn("h-4 w-4 shrink-0", iconColor)} />
+          </div>
+        </div>
+
+        <p className="mt-3 text-2xl font-bold tabular-nums leading-none">{value}</p>
+
+        {(variation || sub) && (
+          <div className="mt-1.5 space-y-0.5">
+            {variation && (
+              <p className={cn("text-xs font-medium", variationColor)}>{variation}</p>
+            )}
+            {sub && (
+              <p className="text-xs text-muted-foreground">{sub}</p>
+            )}
+          </div>
+        )}
+
+        {link && (
+          <a
+            href={link.href}
+            className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors group"
+          >
+            {link.text}
+            <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+          </a>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Dashboard() {
+  const [period, setPeriod] = useState<Period>("mes");
+
+  const row1: Omit<KpiCardProps, "index">[] = [
+    {
+      label: "Ventas del día",
+      value: "S/ 12,450",
+      variation: "+8.3% vs ayer",
+      variationColor: "text-success",
+      icon: TrendingUp,
+      iconColor: "text-success",
+      link: { text: "Ver Reporte Ventas →", href: "/reportes/ventas" },
+    },
+    {
+      label: "Ventas del mes",
+      value: "S/ 284,200",
+      variation: "+12.1% vs mes anterior",
+      variationColor: "text-success",
+      icon: TrendingUp,
+      iconColor: "text-success",
+      link: { text: "Ver Reporte Ventas →", href: "/reportes/ventas" },
+    },
+    {
+      label: "Tasa de devolución",
+      value: "18.4%",
+      variationColor: "text-success",
+      icon: RotateCcw,
+      iconColor: "text-success", // < 20% = green
+      link: { text: "Ver Reporte Devoluciones →", href: "/reportes/devoluciones" },
+    },
+    {
+      label: "Cuentas x cobrar vencidas",
+      value: "S/ 4,200",
+      variationColor: "text-danger",
+      icon: AlertCircle,
+      iconColor: "text-danger", // always red if > 0
+      link: { text: "Ver Reporte CxC →", href: "/reportes/cxc" },
+    },
+  ];
+
+  const row2: Omit<KpiCardProps, "index">[] = [
+    {
+      label: "Gastos operativos del mes",
+      value: "S/ 23,800",
+      sub: "8.4% de las ventas del mes",
+      icon: DollarSign,
+      iconColor: "text-muted-foreground",
+      link: { text: "Ver Reporte Gastos →", href: "/reportes/gastos" },
+    },
+    {
+      label: "Alertas de vencimiento",
+      value: "7 activas",
+      icon: Bell,
+      iconColor: "text-danger", // > 0 = red
+      badge: { value: "7", color: "bg-danger text-danger-foreground" },
+      link: { text: "Ver alertas →", href: "/vencidos/alertas" },
+    },
+    {
+      label: "Clientes atendidos hoy",
+      value: "43",
+      variation: "+5 vs ayer",
+      variationColor: "text-success",
+      icon: Users,
+      iconColor: "text-muted-foreground",
+    },
+    {
+      label: "Pedidos pendientes despacho",
+      value: "12",
+      icon: Truck,
+      iconColor: "text-muted-foreground",
+      badge: { value: "12", color: "bg-warning text-warning-foreground" },
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Page heading */}
-      <div>
-        <h2 className="text-xl font-semibold text-foreground text-balance">
-          Buenos días, Jorge
-        </h2>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Resumen ejecutivo — Viernes, 20 de marzo 2026
-        </p>
-      </div>
+      {/* Page header */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground text-balance">
+            Buenos días, Jorge
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Resumen ejecutivo — Viernes, 20 de marzo 2026
+          </p>
+        </div>
 
-      {/* KPI cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {kpiCards.map((kpi, i) => {
-          const Icon = trendIcons[kpi.trend];
-          return (
-            <Card
-              key={kpi.label}
-              className="shadow-sm animate-fade-in-up"
-              style={{ animationDelay: `${i * 80}ms` }}
+        <ToggleGroup
+          type="single"
+          value={period}
+          onValueChange={(v) => v && setPeriod(v as Period)}
+          className="bg-card border border-border rounded-lg p-0.5"
+        >
+          {periods.map((p) => (
+            <ToggleGroupItem
+              key={p.value}
+              value={p.value}
+              className={cn(
+                "text-xs px-3 h-8 rounded-md font-medium transition-all data-[state=on]:shadow-sm",
+                "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground",
+                "data-[state=off]:text-muted-foreground data-[state=off]:hover:text-foreground"
+              )}
             >
-              <CardContent className="p-5">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  {kpi.label}
-                </p>
-                <p className="mt-2 text-2xl font-bold tabular-nums">{kpi.value}</p>
-                <div className={cn("mt-1 flex items-center gap-1 text-xs font-medium", trendColors[kpi.trend])}>
-                  <Icon className="h-3.5 w-3.5" />
-                  <span>{kpi.change}</span>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+              {p.label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
       </div>
 
-      {/* Charts row */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Bar chart */}
-        <Card className="lg:col-span-2 shadow-sm animate-fade-in-up" style={{ animationDelay: "320ms" }}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Ventas de la Semana</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={ventasSemana} barSize={28}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                <XAxis dataKey="dia" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                <Tooltip
-                  formatter={(value: number) => [`S/ ${value.toLocaleString()}`, "Ventas"]}
-                  contentStyle={{ borderRadius: 8, border: "1px solid hsl(var(--border))", fontSize: 12 }}
-                />
-                <ReferenceLine y={9000} stroke="hsl(var(--accent))" strokeDasharray="4 4" label={{ value: "Meta", position: "right", fontSize: 10, fill: "hsl(var(--accent))" }} />
-                <Bar dataKey="ventas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Category breakdown */}
-        <Card className="shadow-sm animate-fade-in-up" style={{ animationDelay: "400ms" }}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Ventas por Categoría</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {ventasPorCategoria.map((cat) => (
-              <div key={cat.categoria}>
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-medium">{cat.categoria}</span>
-                  <span className="text-muted-foreground tabular-nums">{cat.monto}</span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-muted">
-                  <div
-                    className="h-2 rounded-full bg-primary transition-all"
-                    style={{ width: `${cat.porcentaje}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      {/* KPI Row 1 */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {row1.map((kpi, i) => (
+          <KpiCard key={kpi.label} {...kpi} index={i} />
+        ))}
       </div>
 
-      {/* Bottom row */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* Recent orders */}
-        <Card className="shadow-sm animate-fade-in-up" style={{ animationDelay: "480ms" }}>
-          <CardHeader className="flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-semibold">Pedidos Recientes</CardTitle>
-            <Button variant="ghost" size="sm" className="text-xs text-accent hover:text-accent">
-              Ver todos <ArrowRight className="ml-1 h-3 w-3" />
-            </Button>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-border">
-              {pedidosRecientes.map((p) => {
-                const badge = estadoBadge[p.estado];
-                const Icon = p.estado === "entregado" ? Truck : p.estado === "confirmado" ? CheckCircle2 : Clock;
-                return (
-                  <div key={p.id} className="flex items-center gap-3 px-5 py-3">
-                    <Icon className={cn("h-4 w-4 shrink-0", badge.className.includes("success") ? "text-success" : badge.className.includes("warning") ? "text-warning" : "text-primary")} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{p.cliente}</p>
-                      <p className="text-xs text-muted-foreground">{p.id}</p>
-                    </div>
-                    <span className="text-sm font-semibold tabular-nums">{p.monto}</span>
-                    <Badge variant="secondary" className={cn("text-[10px]", badge.className)}>
-                      {badge.label}
-                    </Badge>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Gastos pending approval */}
-        <Card className="shadow-sm animate-fade-in-up" style={{ animationDelay: "560ms" }}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold">Gastos Pendientes de Aprobación</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {gastosAprobacion.map((g) => (
-              <div key={g.id} className="rounded-lg border border-border p-4 space-y-2">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium">{g.concepto}</p>
-                    <p className="text-xs text-muted-foreground">{g.id} · {g.solicitante}</p>
-                  </div>
-                  <span className="text-sm font-bold tabular-nums">{g.monto}</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" className="h-7 bg-success hover:bg-success/90 text-success-foreground text-xs">
-                    Aprobar
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-7 text-xs text-danger border-danger/30 hover:bg-danger/5">
-                    Rechazar
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      {/* KPI Row 2 */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {row2.map((kpi, i) => (
+          <KpiCard key={kpi.label} {...kpi} index={i + 4} />
+        ))}
       </div>
     </div>
   );
