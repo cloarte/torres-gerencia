@@ -150,7 +150,8 @@ const topRutas = [
 ];
 
 // ── Custom tooltip for line chart ────────────────────────────────
-function LineTooltip({ active, payload, label }: any) {
+import { forwardRef } from "react";
+const LineTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, label }, ref) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-md text-xs space-y-1">
