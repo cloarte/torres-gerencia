@@ -6,50 +6,65 @@ import {
   Wallet,
   AlertTriangle,
   UserCircle,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
-const sections = [
+interface NavItem {
+  title: string;
+  url: string;
+  icon?: React.ElementType;
+}
+
+interface NavSection {
+  label: string;
+  items: NavItem[];
+  collapsible?: boolean;
+}
+
+const sections: NavSection[] = [
   {
     label: "INICIO",
-    items: [
-      { title: "Dashboard", url: "/reportes/dashboard", icon: LayoutDashboard },
-    ],
+    items: [{ title: "Dashboard", url: "/reportes/dashboard", icon: LayoutDashboard }],
   },
   {
     label: "PEDIDOS",
-    items: [
-      { title: "Pedidos", url: "/pedidos", icon: ShoppingCart },
-    ],
+    items: [{ title: "Lista de Pedidos", url: "/pedidos", icon: ShoppingCart }],
   },
   {
     label: "REPORTES",
+    collapsible: true,
     items: [
-      { title: "Reportes", url: "/reportes", icon: BarChart3 },
+      { title: "Ventas x Canal", url: "/reportes/ventas" },
+      { title: "Ventas x Vendedor", url: "/reportes/ventas-vendedor" },
+      { title: "Gastos x Canal", url: "/reportes/gastos" },
+      { title: "Cuentas x Cobrar", url: "/reportes/cxc" },
+      { title: "Ventas x Producto", url: "/reportes/ventas-producto" },
+      { title: "Ventas x Línea", url: "/reportes/ventas-linea" },
+      { title: "Devoluciones", url: "/reportes/devoluciones" },
     ],
   },
   {
     label: "GASTOS",
-    items: [
-      { title: "Gastos", url: "/gastos", icon: Wallet },
-    ],
+    items: [{ title: "Gastos", url: "/gastos", icon: Wallet }],
   },
   {
     label: "VENCIDOS",
-    items: [
-      { title: "Vencidos", url: "/vencidos", icon: AlertTriangle },
-    ],
+    items: [{ title: "Vencidos", url: "/vencidos", icon: AlertTriangle }],
   },
   {
     label: "CUENTA",
-    items: [
-      { title: "Mi Cuenta", url: "/cuenta", icon: UserCircle },
-    ],
+    items: [{ title: "Mi Cuenta", url: "/cuenta", icon: UserCircle }],
   },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
+  const [reportesOpen, setReportesOpen] = useState(
+    location.pathname.startsWith("/reportes/") && location.pathname !== "/reportes/dashboard"
+  );
 
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-64 flex-col bg-primary">
@@ -65,35 +80,64 @@ export function AppSidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
-        {sections.map((section) => (
-          <div key={section.label}>
-            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-sidebar-muted">
-              {section.label}
-            </p>
-            <ul className="space-y-0.5">
-              {section.items.map((item) => {
-                const active = location.pathname.startsWith(item.url);
-                return (
-                  <li key={item.url}>
-                    <Link
-                      to={item.url}
-                      className={cn(
-                        "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                        active
-                          ? "bg-primary-light text-primary"
-                          : "text-primary-foreground/80 hover:bg-sidebar-accent hover:text-primary-foreground"
-                      )}
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
+        {sections.map((section) => {
+          const isReportes = section.collapsible;
+          const sectionActive = section.items.some((item) => location.pathname === item.url || location.pathname.startsWith(item.url + "/"));
+
+          return (
+            <div key={section.label}>
+              {isReportes ? (
+                <button
+                  onClick={() => setReportesOpen(!reportesOpen)}
+                  className="flex w-full items-center justify-between mb-2 px-3 group"
+                >
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="h-3.5 w-3.5 text-sidebar-muted" />
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-sidebar-muted group-hover:text-primary-foreground/70 transition-colors">
+                      {section.label}
+                    </span>
+                  </div>
+                  {reportesOpen ? (
+                    <ChevronDown className="h-3 w-3 text-sidebar-muted" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-sidebar-muted" />
+                  )}
+                </button>
+              ) : (
+                <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-sidebar-muted">
+                  {section.label}
+                </p>
+              )}
+
+              {(!isReportes || reportesOpen) && (
+                <ul className="space-y-0.5">
+                  {section.items.map((item) => {
+                    const active = location.pathname === item.url;
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.url}>
+                        <Link
+                          to={item.url}
+                          className={cn(
+                            "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                            isReportes && "pl-8 text-xs",
+                            active
+                              ? "bg-primary-light text-primary"
+                              : "text-primary-foreground/80 hover:bg-sidebar-accent hover:text-primary-foreground"
+                          )}
+                        >
+                          {Icon && <Icon className="h-4 w-4 shrink-0" />}
+                          <span>{item.title}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          );
+        })}
       </nav>
 
       {/* Footer */}
