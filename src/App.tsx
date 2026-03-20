@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
 import Dashboard from "@/pages/Dashboard";
+import Pedidos from "@/pages/Pedidos";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ const App = () => (
           <Route path="/" element={<Navigate to="/reportes/dashboard" replace />} />
           <Route element={<AppLayout />}>
             <Route path="/reportes/dashboard" element={<Dashboard />} />
+            <Route path="/pedidos" element={<Pedidos />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
