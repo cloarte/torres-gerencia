@@ -14,6 +14,7 @@ import ReporteVentasProducto from "@/pages/ReporteVentasProducto";
 import ReporteVentasLinea from "@/pages/ReporteVentasLinea";
 import ReporteDevoluciones from "@/pages/ReporteDevoluciones";
 import Gastos from "@/pages/Gastos";
+import VencidosPool from "@/pages/VencidosPool";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
