@@ -16,6 +16,8 @@ import ReporteDevoluciones from "@/pages/ReporteDevoluciones";
 import Gastos from "@/pages/Gastos";
 import VencidosPool from "@/pages/VencidosPool";
 import VencidosAlertas from "@/pages/VencidosAlertas";
+import RutasEstado from "@/pages/RutasEstado";
+import RutasSobrestock from "@/pages/RutasSobrestock";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +43,8 @@ const App = () => (
             <Route path="/gastos" element={<Gastos />} />
             <Route path="/vencidos/pool" element={<VencidosPool />} />
             <Route path="/vencidos/alertas" element={<VencidosAlertas />} />
+            <Route path="/rutas/estado" element={<RutasEstado />} />
+            <Route path="/rutas/sobrestock" element={<RutasSobrestock />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
