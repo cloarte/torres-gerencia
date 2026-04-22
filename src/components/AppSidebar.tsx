@@ -8,6 +8,8 @@ import {
   UserCircle,
   ChevronDown,
   ChevronRight,
+  Truck,
+  BarChart2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -48,7 +50,14 @@ const sections: NavSection[] = [
   },
   {
     label: "GASTOS",
-    items: [{ title: "Gastos", url: "/gastos", icon: Wallet }],
+    items: [{ title: "Aprobar Gastos", url: "/gastos", icon: Wallet }],
+  },
+  {
+    label: "RUTAS",
+    items: [
+      { title: "Estado de Rutas", url: "/rutas/estado", icon: Truck },
+      { title: "Reporte Sobrestock", url: "/rutas/sobrestock", icon: BarChart2 },
+    ],
   },
   {
     label: "VENCIDOS",
